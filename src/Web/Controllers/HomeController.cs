@@ -2,9 +2,15 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Octokit;
+using Octokit.Internal;
 using Web.Models;
+using Web.ViewModel;
 
 namespace Web.Controllers
 {
@@ -12,32 +18,13 @@ namespace Web.Controllers
     {
         public IActionResult Index()
         {
+            ////var profile = OnGet();
+            //string gitHubName = User.FindFirst(c => c.Type == ClaimTypes.Name)?.Value;
+            //string gitHubLogin = User.FindFirst(c => c.Type == "urn:github:login")?.Value;
+            //string gitHubUrl = User.FindFirst(c => c.Type == "urn:github:url")?.Value;
+            //string githubAvater = User.FindFirst(c => c.Type == "urn:github:avatar")?.Value;
+            //string accessToken = "";
             return View();
-        }
-
-        public IActionResult About()
-        {
-            ViewData["Message"] = "Your application description page.";
-
-            return View();
-        }
-
-        public IActionResult Contact()
-        {
-            ViewData["Message"] = "Your contact page.";
-
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

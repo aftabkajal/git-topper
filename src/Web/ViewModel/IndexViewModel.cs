@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Octokit;
+using Octokit.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,17 +10,14 @@ using System.Threading.Tasks;
 
 namespace Web.ViewModel
 {
-    public class IndexViewModel: PageModel
+    public class IndexViewModel : PageModel
     {
         public string GitHubAvatar { get; set; }
-
         public string GitHubLogin { get; set; }
-
         public string GitHubName { get; set; }
-
         public string GitHubUrl { get; set; }
-
-        public void OnGet()
+        public IReadOnlyList<Repository> Repositories { get; set; }
+        public async Task OnGetAsync()
         {
             if (User.Identity.IsAuthenticated)
             {
@@ -25,6 +25,12 @@ namespace Web.ViewModel
                 GitHubLogin = User.FindFirst(c => c.Type == "urn:github:login")?.Value;
                 GitHubUrl = User.FindFirst(c => c.Type == "urn:github:url")?.Value;
                 GitHubAvatar = User.FindFirst(c => c.Type == "urn:github:avatar")?.Value;
+
+                string accessToken = await HttpContext.GetTokenAsync("access_token");
+
+                var github = new GitHubClient(new ProductHeaderValue("AspNetCoreGitHubAuth"), new InMemoryCredentialStore(new Credentials(accessToken)));
+                Repositories = await github.Repository.GetAllForCurrent();
+
             }
         }
     }
