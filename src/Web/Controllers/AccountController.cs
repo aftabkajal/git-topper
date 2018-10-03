@@ -11,8 +11,9 @@ namespace Web.Controllers
     public class AccountController : Controller
     {
         [HttpGet]
-        public IActionResult Login(string returnUrl = "/")
+        public async Task<IActionResult> Login(string returnUrl = "/")
         {
+            
             return Challenge(new AuthenticationProperties() { RedirectUri = returnUrl });
         }
     }

@@ -33,19 +33,18 @@ namespace Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.Configure<CookiePolicyOptions>(options =>
-            //{
-            //    // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-            //    options.CheckConsentNeeded = context => true;
-            //    options.MinimumSameSitePolicy = SameSiteMode.None;
-            //});
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
 
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = "GitHub";
-                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             }).AddCookie()
 
             //.AddGitHub(options =>
@@ -60,19 +59,36 @@ namespace Web
 
             .AddOAuth("Github", options =>
             {
-                options.ClientId = "13704ce5cf67f546ec04";
-                options.ClientSecret = "0bd5efdc4ff3889f8f3027efdb5eb75af24c1e92";
+                options.ClientId = Configuration["GitHub:ClientId"];
+                options.ClientSecret = Configuration["GitHub:ClientSecret"];
                 options.CallbackPath = new PathString("/signin-github");
-
+                
                 options.AuthorizationEndpoint = "https://github.com/login/oauth/authorize";
                 options.TokenEndpoint = "https://github.com/login/oauth/access_token";
                 options.UserInformationEndpoint = "https://api.github.com/user";
-                options.SaveTokens = true;
-                //options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
-                //options.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
-                //options.ClaimActions.MapJsonKey("urn:github:login", "login");
-                //options.ClaimActions.MapJsonKey("urn:github:url", "html_url");
-                //options.ClaimActions.MapJsonKey("urn:github:avatar", "avatar_url");
+
+                options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
+                options.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
+                options.ClaimActions.MapJsonKey("urn:github:login", "login");
+                options.ClaimActions.MapJsonKey("urn:github:url", "html_url");
+                options.ClaimActions.MapJsonKey("urn:github:avatar", "avatar_url");
+
+                options.Events = new OAuthEvents
+                {
+                    OnCreatingTicket = async context =>
+                    {
+                        var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
+                        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", context.AccessToken);
+
+                        var response = await context.Backchannel.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, context.HttpContext.RequestAborted);
+                        response.EnsureSuccessStatusCode();
+
+                        var user = JObject.Parse(await response.Content.ReadAsStringAsync());
+
+                        context.RunClaimActions(user);
+                    }
+                };
             });
 
             services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
@@ -92,12 +108,11 @@ namespace Web
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
-
+            app.UseAuthentication();
             app.UseHttpsRedirection();
             //app.UseStaticFiles();
             app.UseCookiePolicy();
             app.UseStaticFiles();
-            app.UseAuthentication();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
