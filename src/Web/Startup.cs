@@ -46,9 +46,7 @@ namespace Web
                 options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                //options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                //options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                //options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+
                 options.DefaultChallengeScheme = "GitHub";
             }).AddCookie()
             .AddOAuth("GitHub", options =>
