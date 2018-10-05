@@ -7,14 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Controllers
 {
-    [Route("[controller]/[action]")]
     public class AccountController : Controller
     {
         [HttpGet]
-        public async Task<IActionResult> Login(string returnUrl = "/")
+        public IActionResult Login(string returnUrl = "/")
         {
             
-            return Challenge(new AuthenticationProperties() { RedirectUri = returnUrl });
+            return Challenge(new AuthenticationProperties() { RedirectUri = returnUrl }, "GitHub");
         }
     }
 }

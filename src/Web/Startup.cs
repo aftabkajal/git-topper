@@ -42,22 +42,16 @@ namespace Web
 
             services.AddAuthentication(options =>
             {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                //options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                //options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                //options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = "GitHub";
             }).AddCookie()
-
-            //.AddGitHub(options =>
-            //{
-            //    options.ClientId = "13704ce5cf67f546ec04";
-            //    options.ClientSecret = "0bd5efdc4ff3889f8f3027efdb5eb75af24c1e92";
-            //    options.CallbackPath = new PathString("/signin-github");
-            //    options.Scope.Add("user:email");
-            //    options.SaveTokens = true;
-            //});
-
-
-            .AddOAuth("Github", options =>
+            .AddOAuth("GitHub", options =>
             {
                 options.ClientId = Configuration["GitHub:ClientId"];
                 options.ClientSecret = Configuration["GitHub:ClientSecret"];
@@ -66,6 +60,7 @@ namespace Web
                 options.AuthorizationEndpoint = "https://github.com/login/oauth/authorize";
                 options.TokenEndpoint = "https://github.com/login/oauth/access_token";
                 options.UserInformationEndpoint = "https://api.github.com/user";
+                options.SaveTokens = true;
 
                 options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
                 options.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
@@ -110,7 +105,6 @@ namespace Web
             }
             app.UseAuthentication();
             app.UseHttpsRedirection();
-            //app.UseStaticFiles();
             app.UseCookiePolicy();
             app.UseStaticFiles();
             app.UseMvc(routes =>

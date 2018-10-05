@@ -19,10 +19,10 @@ namespace Web.Controllers
         public IActionResult Index()
         {
             ////var profile = OnGet();
-            //string gitHubName = User.FindFirst(c => c.Type == ClaimTypes.Name)?.Value;
-            //string gitHubLogin = User.FindFirst(c => c.Type == "urn:github:login")?.Value;
-            //string gitHubUrl = User.FindFirst(c => c.Type == "urn:github:url")?.Value;
-            //string githubAvater = User.FindFirst(c => c.Type == "urn:github:avatar")?.Value;
+            string gitHubName = User.FindFirst(c => c.Type == ClaimTypes.Name)?.Value;
+            string gitHubLogin = User.FindFirst(c => c.Type == "urn:github:login")?.Value;
+            string gitHubUrl = User.FindFirst(c => c.Type == "urn:github:url")?.Value;
+            string githubAvater = User.FindFirst(c => c.Type == "urn:github:avatar")?.Value;
             //string accessToken = "";
             return View();
         }
