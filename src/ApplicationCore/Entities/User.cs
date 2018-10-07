@@ -1,17 +1,17 @@
-﻿using System;
+﻿using ApplicationCore.SharedKernel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Web.Models
+namespace ApplicationCore.Entities
 {
     /// <summary>
     /// RootObject
     /// </summary>
-    public class User
+    public class User : Entity
     {
         public string Login { get; set; }
-        public int Id { get; set; }
         public string NodeId { get; set; }
         public string AvatarUrl { get; set; }
         public string GravatarId { get; set; }
