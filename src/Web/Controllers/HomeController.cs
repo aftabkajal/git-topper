@@ -31,6 +31,7 @@ namespace Web.Controllers
                 var repo = github.Repository.GetAllForUser(user.Login);
                 var Repositoriesall = await github.Repository.GetAllForCurrent();
                 var star = await github.Activity.Starring.GetAllForCurrent();
+                var stars = 
                 //foreach(var item in Repositoriesall)
                 //{
                 //    item.StargazersCount;
