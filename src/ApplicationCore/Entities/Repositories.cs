@@ -75,7 +75,6 @@ namespace ApplicationCore.Entities
         public bool HasWiki { get; set; }
         public bool HasPages { get; set; }
         public int ForksCount { get; set; }
-        public object MirrorUrl { get; set; }
         public bool Archived { get; set; }
         public int OpenIssuesCount { get; set; }
         public License License { get; set; }

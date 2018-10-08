@@ -1,7 +1,9 @@
 ﻿using ApplicationCore.Interfaces;
 using ApplicationCore.SharedKernel;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,54 +11,76 @@ namespace Infrastructure.Data
 {
     public class EfRepository<T> : IRepository<T>, IAsyncRepository<T> where T : Entity
     {
-        public T Add(T entity)
+        protected GithubTopperContext _dbContext;
+
+        public EfRepository(GithubTopperContext dbContext)
         {
-            throw new NotImplementedException();
+            _dbContext = dbContext;
         }
 
-        public Task<T> AddAsync(T entity)
+        public T Add(T entity)
         {
-            throw new NotImplementedException();
+            _dbContext.Set<T>().Add(entity);
+            _dbContext.SaveChanges();
+
+            return entity;
+        }
+
+        public async Task<T> AddAsync(T entity)
+        {
+            _dbContext.Set<T>().Add(entity);
+            await _dbContext.SaveChangesAsync();
+
+            return entity;
         }
 
         public void Delete(T entity)
         {
-            throw new NotImplementedException();
+            _dbContext.Set<T>().Remove(entity);
+            _dbContext.SaveChanges();
         }
 
-        public Task DeleteAsync(T entity)
+        public async Task DeleteAsync(T entity)
         {
-            throw new NotImplementedException();
+            _dbContext.Set<T>().Remove(entity);
+            await _dbContext.SaveChangesAsync();
         }
 
         public T GetById(int id)
         {
-            throw new NotImplementedException();
+            return _dbContext.Set<T>().Find(id);
         }
 
-        public Task<T> GetByIdAsync(int id)
+        public async Task<T> GetByIdAsync(long id)
         {
-            throw new NotImplementedException();
+            return await _dbContext.Set<T>().FindAsync(id);
         }
 
         public IEnumerable<T> ListAll()
         {
-            throw new NotImplementedException();
+            return _dbContext.Set<T>().AsEnumerable();
         }
 
-        public Task<List<T>> ListAllAsync()
+        public async Task<List<T>> ListAllAsync()
         {
-            throw new NotImplementedException();
+            return await _dbContext.Set<T>().ToListAsync();
+        }
+
+        public async Task<IEnumerable<T>> ListAllAsync(int id)
+        {
+            return await _dbContext.Set<T>().Include(p => p.Id == id).ToListAsync();
         }
 
         public void Update(T entity)
         {
-            throw new NotImplementedException();
+            _dbContext.Entry(entity).State = EntityState.Modified;
+            _dbContext.SaveChanges();
         }
 
-        public Task UpdateAsync(T entity)
+        public async Task UpdateAsync(T entity)
         {
-            throw new NotImplementedException();
+            _dbContext.Entry(entity).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

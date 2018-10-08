@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using ApplicationCore.Entities;
+using ApplicationCore.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +19,13 @@ namespace Web.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly IAsyncRepository<Repositories> _asyncRepository;
         public IReadOnlyList<Repository> Repositories { get; set; }
+
+        public HomeController(IAsyncRepository<Repositories> asyncRepository)
+        {
+            this._asyncRepository = asyncRepository;
+        }
         public async Task<IActionResult> Index()
         {
 
