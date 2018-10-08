@@ -17,6 +17,7 @@ namespace Web.Controllers
 {
     public class HomeController : Controller
     {
+        public IReadOnlyList<Repository> Repositories { get; set; }
         public async Task<IActionResult> Index()
         {
 
@@ -27,22 +28,12 @@ namespace Web.Controllers
                 var github = new GitHubClient(new ProductHeaderValue("GitTopperApp"));
                 github.Credentials = new Credentials(accessToken);
                 var user = await github.User.Current();
-                var repositories = user.PublicRepos;
-                var repo = github.Repository.GetAllForUser(user.Login);
-                var Repositoriesall = await github.Repository.GetAllForCurrent();
-                var star = await github.Activity.Starring.GetAllForCurrent();
-                var stars = 
-                //foreach(var item in Repositoriesall)
-                //{
-                //    item.StargazersCount;
-
-                //}
-
-                var JsonFinalData = JsonConvert.SerializeObject(Repositoriesall);
-               
-
-                
-                //var user = await github.User.Get(gitHubLogin);
+                Repositories = await github.Repository.GetAllForCurrent();
+                foreach(var iteam in Repositories)
+                {
+                  string userUei =  iteam.Owner.HtmlUrl;
+                    
+                }
 
             }
             return View();
