@@ -13,13 +13,18 @@ namespace Infrastructure.Data
         public DbSet<Owner> Owner { get; set; }
         public DbSet<Repositories> Repositories { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Repositories>()
-                .HasOne<Owner>(own => own.Owner)
-                .WithMany(repos => repos.Repositories)
-                .IsRequired();
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+        //    modelBuilder.Entity<Repositories>()
+        //        .HasOne<Owner>(own => own.Owner)
+        //        .WithMany(repos => repos.Repositories)
+        //        .IsRequired();
 
+        //}
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.EnableSensitiveDataLogging();
+            
         }
 
 

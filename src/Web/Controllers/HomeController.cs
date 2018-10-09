@@ -24,6 +24,7 @@ namespace Web.Controllers
         private readonly IAsyncRepository<Repositories> _repoRepository;
         private readonly IAsyncRepository<Owner> _ownerRepository;
         protected IReadOnlyList<Repository> Repositories;
+        protected User user;
         public HomeController(IAsyncRepository<Repositories> asyncRepository,
             IAsyncRepository<Owner> ownerRepository
             )
@@ -39,26 +40,31 @@ namespace Web.Controllers
             if (User.Identity.IsAuthenticated)
             {
                string accessToken = await HttpContext.GetTokenAsync("access_token");
-               GitHubClient github = new GitHubClient(new ProductHeaderValue("GitTopperApp"));
+               var github = new GitHubClient(new ProductHeaderValue("GitTopperApp"));
                github.Credentials = new Credentials(accessToken);
-               User user = await github.User.Current();
-               Repositories = await github.Repository.GetAllForUser(user.Login);
-               await InsertInToDataBase(Repositories, user);
+               user = await github.User.Current();
+                if(user != null) { 
+                await InsertOrUpdateUser(user);
+                }
+                Repositories = await github.Repository.GetAllForCurrent();
+                if(Repositories != null) { 
+                foreach(var item in Repositories) {
+                        var repo = _repoRepository.GetByIdAsync(item.Id);
+                        if(repo != null && repo.Id == item.Id)
+                        {
+                           await _repoRepository.UpdateAsync(MapRepo(item));
+                        }
+                        else { 
+                            await _repoRepository.AddAsync(MapRepo(item));
+                        }
+                    }
+                }
+
             }
             return View();
         }
 #endregion 
 #region private area 
-
-private async Task InsertInToDataBase(IReadOnlyList<Repository> repositories, User user)
-        {
-               await InsertOrUpdateUser(user);
-                foreach (var item in repositories)
-                {
-                   await _repoRepository.AddAsync(MapRepo(item));
-                }        
-
-        }
         private Repositories MapRepo(Repository item)
         {
             Repositories repos = new Repositories()
@@ -87,7 +93,7 @@ private async Task InsertInToDataBase(IReadOnlyList<Repository> repositories, Us
         private async Task InsertOrUpdateUser(User user)
         {
             var getUser = await _ownerRepository.GetByIdAsync(user.Id);
-            if (user.Id == getUser.Id)
+            if (getUser != null && user.Id == getUser.Id)
             {
                await _ownerRepository.UpdateAsync(MapUserToOwner(user));
             }
