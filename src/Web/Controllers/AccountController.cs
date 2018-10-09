@@ -4,16 +4,21 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace Web.Controllers
 {
     public class AccountController : Controller
     {
-        [HttpGet]
-        public IActionResult Login(string returnUrl = "/")
+        private readonly IConfiguration _configuration;
+        public AccountController(IConfiguration configuration)
         {
-            
-            return Challenge(new AuthenticationProperties() { RedirectUri = returnUrl }, "GitHub");
+            _configuration = configuration;
+        }
+        [HttpGet]
+        public async Task Login(string returnUrl = "/")
+        {            
+            await HttpContext.ChallengeAsync("GitHub", new AuthenticationProperties() { RedirectUri = returnUrl });
         }
     }
 }
